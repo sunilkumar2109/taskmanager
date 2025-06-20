@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task Manager Pro</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body>
+    <!-- Quick Access Buttons (for testing) -->
+    <div style="position: fixed; top: 10px; right: 10px; z-index: 9999; display: flex; gap: 10px;">
+        <button onclick="window.location.href='./newadmin.html'" style="padding: 5px 10px; background: #ff6b6b; color: white; border: none; border-radius: 4px;">Admin Dashboard</button>
+        <button onclick="window.location.href='./index.html'" style="padding: 5px 10px; background: #4ecdc4; color: white; border: none; border-radius: 4px;">User Dashboard</button>
+        <button onclick="showAccountsModal()" style="padding: 5px 10px; background: #ffa726; color: white; border: none; border-radius: 4px;">View Accounts</button>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="#" class="logo">
+                <i class="fas fa-tasks"></i> Task Manager Pro
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#teams">Teams</a></li>
+                <li><a href="#testimonials">Reviews</a></li>
+                <li><a href="#enterprise">Enterprise</a></li>
+            </ul>
+            <div class="cta-buttons">
+                <button class="btn btn-secondary" onclick="showLoginModal()">Login</button>
+                <button class="btn btn-primary" onclick="showSignupModal()">Get Started Free</button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Login Modal with Role Selection -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('loginModal')">
+                    <i class="fas fa-times"></i>
+                </span>
+                <div class="auth-header">
+                    <h2><i class="fas fa-sign-in-alt"></i> Welcome Back</h2>
+                    <p>Sign in to your Task Manager Pro account</p>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm" class="auth-form">
+                    <div id="loginError" class="error-message" style="display: none;"></div>
+                    
+                    <div class="form-group">
+                        <label for="loginEmail">
+                            <i class="fas fa-envelope"></i>
+                            Email Address
+                        </label>
+                        <input type="email" id="loginEmail" name="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">
+                            <i class="fas fa-lock"></i>
+                            Password
+                        </label>
+                        <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
+                    </div>
+                    
+                    <!-- Login Role Selection -->
+                    <div class="form-group role-selector">
+                        <label for="loginRole">
+                            <i class="fas fa-user-cog"></i>
+                            Login As
+                        </label>
+                        <div class="role-options">
+                            <label class="role-option">
+                                <input type="radio" name="loginRole" value="user" checked>
+                                <span class="role-icon"><i class="fas fa-user"></i></span>
+                                <span class="role-label">User</span>
+                                <span class="role-description">Access user dashboard</span>
+                            </label>
+                            <label class="role-option">
+                                <input type="radio" name="loginRole" value="admin">
+                                <span class="role-icon"><i class="fas fa-crown"></i></span>
+                                <span class="role-label">Admin</span>
+                                <span class="role-description">Access admin panel</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline btn-full" onclick="closeModal('loginModal')">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-full">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </button>
+                    </div>
+                </form>
+                <div class="form-footer">
+                    <p>Don't have an account? <a href="#" onclick="switchToSignup()">Sign up for free</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal with reCAPTCHA -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('signupModal')">
+                    <i class="fas fa-times"></i>
+                </span>
+                <div class="auth-header">
+                    <h2><i class="fas fa-user-plus"></i> Get Started Free</h2>
+                    <p>Create your Task Manager Pro account</p>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="signupForm" class="auth-form">
+                    <div id="signupError" class="error-message" style="display: none;"></div>
+                    
+                    <div class="form-group">
+                        <label for="signupUsername">
+                            <i class="fas fa-user"></i>
+                            Username
+                        </label>
+                        <input type="text" id="signupUsername" name="username" placeholder="Choose a username" required minlength="3">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">
+                            <i class="fas fa-envelope"></i>
+                            Email Address
+                        </label>
+                        <input type="email" id="signupEmail" name="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">
+                            <i class="fas fa-lock"></i>
+                            Password
+                        </label>
+                        <input type="password" id="signupPassword" name="password" placeholder="Create a strong password" required minlength="6">
+                        <div class="password-requirements">
+                            <small>Password must be at least 6 characters long</small>
+                        </div>
+                    </div>
+                    <div class="form-group role-selector">
+                        <label for="userRole">
+                            <i class="fas fa-user-cog"></i>
+                            Account Type
+                        </label>
+                        <div class="role-options">
+                            <label class="role-option">
+                                <input type="radio" name="role" value="user" checked>
+                                <span class="role-icon"><i class="fas fa-user"></i></span>
+                                <span class="role-label">User</span>
+                                <span class="role-description">Standard access to tasks and features</span>
+                            </label>
+                            <label class="role-option">
+                                <input type="radio" name="role" value="admin">
+                                <span class="role-icon"><i class="fas fa-crown"></i></span>
+                                <span class="role-label">Admin</span>
+                                <span class="role-description">Full access to all features and management tools</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Google reCAPTCHA -->
+                    <div class="form-group">
+                        <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline btn-full" onclick="closeModal('signupModal')">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-full">
+                            <i class="fas fa-rocket"></i> Create Account
+                        </button>
+                    </div>
+                </form>
+                <div class="form-footer">
+                    <p>Already have an account? <a href="#" onclick="switchToLogin()">Sign in here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activation Modal -->
+    <div id="activationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('activationModal')">×</span>
+                <h2><i class="fas fa-envelope"></i> Activate Your Account</h2>
+                <p>Please check your email to activate your account</p>
+            </div>
+            <div class="modal-body">
+                <div class="activation-status activation-pending">
+                    <div class="activation-icon">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                    <h3>Activation Required</h3>
+                    <p>We've sent an activation email to <span id="activationEmail"></span>. Please check your inbox and click the activation link to verify your account.</p>
+                    
+                    <button class="activation-link btn btn-primary" onclick="simulateActivation()">
+                        <i class="fas fa-link"></i> Click here to simulate activation email
+                    </button>
+                </div>
+                
+                <div class="resend-section">
+                    <p>Didn't receive the email? <button class="link-button" id="resendLink" onclick="resendActivationEmail()">Resend activation email</button> <span id="resendTimer" class="resend-timer"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activation Success Modal -->
+    <div id="activationSuccessModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('activationSuccessModal')">×</span>
+                <h2><i class="fas fa-check-circle"></i> Account Activated!</h2>
+                <p>Your account has been successfully activated</p>
+            </div>
+            <div class="modal-body">
+                <div class="activation-status activation-success">
+                    <div class="activation-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3>Welcome to Task Manager Pro!</h3>
+                    <p>Your account has been successfully activated. You can now log in and start managing your tasks.</p>
+                </div>
+                
+                <div class="form-actions" style="margin-top: 2rem;">
+                    <button type="button" class="btn btn-full btn-primary" onclick="closeModal('activationSuccessModal'); showLoginModal()">
+                        <i class="fas fa-sign-in-alt"></i> Sign In Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accounts Management Modal -->
+    <div id="accountsModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('accountsModal')">×</span>
+                <h2><i class="fas fa-users"></i> Registered Accounts</h2>
+                <p>All registered users in the system</p>
+            </div>
+            <div class="modal-body">
+                <div id="accountsList" class="accounts-list">
+                    <!-- Accounts will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Work Smarter. Move Faster. Stay Aligned.</h1>
+            <p>Ditch the complexity. Task Manager Pro helps your team plan, track, and deliver work 10× faster — without the Asana clutter.</p>
+            <div class="hero-cta">
+                <button class="btn btn-primary" onclick="showSignupModal()">
+                    <i class="fas fa-rocket"></i> Start for Free
+                </button>
+                <button class="btn btn-secondary" onclick="showDemoModal()">
+                    <i class="fas fa-play"></i> Book a Demo
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <h2>🔥 Why Teams Are Switching from Asana to Task Manager Pro</h2>
+                <p>Experience the perfect blend of simplicity and power</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">✅</div>
+                    <h3>Minimal Learning Curve</h3>
+                    <p>Built for humans, not project managers. Your team gets productive in hours, not weeks.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Speed Meets Simplicity</h3>
+                    <p>Lightning-fast interface, keyboard shortcuts, and intelligent prioritization. No more clicking through 5 tabs to find a task.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">🤝</div>
+                    <h3>Real Collaboration</h3>
+                    <p>@mention teammates, share feedback, attach files — all in one place. Zero noise, maximum clarity.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">📈</div>
+                    <h3>Smart Automation</h3>
+                    <p>Automate repetitive workflows, follow-ups, and status updates with a click. Save time and reduce manual errors.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">📊</div>
+                    <h3>Insightful Dashboards</h3>
+                    <p>Instant visibility into team progress, blockers, and goals. Built-in analytics, no add-ons needed.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Two-Way Sync with Tools You Already Use</h3>
+                    <p>Integrates natively with Slack, Google Workspace, Notion, GitHub, and more.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Teams Section -->
+    <section id="teams" class="teams">
+        <div class="container">
+            <div class="section-header">
+                <h2>🧠 Built for Every Team</h2>
+                <p>Whether you're building products, running campaigns, or managing operations</p>
+            </div>
+            <div class="teams-grid">
+                <div class="team-card animate-on-scroll">
+                    <h3><i class="fas fa-code"></i> Product & Engineering</h3>
+                    <p>Sprint planning, bug tracking, roadmap alignment. Keep your development cycle smooth and predictable.</p>
+                </div>
+                <div class="team-card animate-on-scroll">
+                    <h3><i class="fas fa-bullhorn"></i> Marketing</h3>
+                    <p>Campaign launches, content calendars, social media scheduling. Execute flawless marketing strategies.</p>
+                </div>
+                <div class="team-card animate-on-scroll">
+                    <h3><i class="fas fa-cogs"></i> Operations</h3>
+                    <p>SOPs, approvals, project execution. Streamline your operational workflows with ease.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <h2>🌟 Loved by High-Growth Teams</h2>
+                <p>See what teams are saying about their transformation</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial animate-on-scroll">
+                    <p>"We migrated from Asana in less than a day. Task Manager Pro is cleaner, faster, and way easier to adopt."</p>
+                    <div class="testimonial-author">— Rina Shah, Head of Product, NovaTech</div>
+                </div>
+                <div class="testimonial animate-on-scroll">
+                    <p>"Finally a tool that works how we think. Our productivity jumped 40% in the first month."</p>
+                    <div class="testimonial-author">— Daniel Lee, COO, BrightEdge</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enterprise Section -->
+    <section id="enterprise" class="enterprise">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <h2>💼 Ready for Business</h2>
+                <p>Enterprise-grade features that scale with your organization</p>
+            </div>
+            <div class="enterprise-features">
+                <div class="enterprise-feature animate-on-scroll">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Enterprise-grade security & compliance</span>
+                </div>
+                <div class="enterprise-feature animate-on-scroll">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Role-based access and permissions</span>
+                </div>
+                <div class="enterprise-feature animate-on-scroll">
+                    <i class="fas fa-cloud"></i>
+                    <span>Cloud or on-premise deployment options</span>
+                </div>
+                <div class="enterprise-feature animate-on-scroll">
+                    <i class="fas fa-headset"></i>
+                    <span>Priority support and onboarding assistance</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="final-cta">
+        <div class="container">
+            <h2>🚀 Start for Free — No Credit Card Needed</h2>
+            <p>Try Task Manager Pro Today. It's everything Asana should have been.</p>
+            <div class="final-cta-buttons">
+                <button class="btn btn-primary" onclick="showSignupModal()">
+                    <i class="fas fa-rocket"></i> Get Started Now
+                </button>
+                <button class="btn btn-secondary" onclick="showDemoModal()">
+                    <i class="fas fa-calendar"></i> Book a Demo
+                </button>
+            </div>
+        </div>
+    </section>
+
+<style>
+/* Enhanced styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    color: #333;
+    line-height: 1.6;
+}
+
+.header {
+    background: #fff;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 1.5rem;
+    text-decoration: none;
+    color: #333;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #555;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #007bff;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.hero {
+    text-align: center;
+    padding: 6rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.hero-cta {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 4rem 1rem;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.features-grid, .teams-grid, .testimonials-grid {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.feature-card, .team-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover, .team-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.testimonial {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    font-style: italic;
+}
+
+.testimonial-author {
+    margin-top: 1rem;
+    font-weight: 600;
+    color: #666;
+}
+
+.enterprise {
+    background: #f8f9fa;
+}
+
+.enterprise-features {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.enterprise-feature {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.enterprise-feature i {
+    font-size: 1.5rem;
+    color: #007bff;
+}
+
+.final-cta {
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 4rem 1rem;
+}
+
+.final-cta h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.final-cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 2% auto;
+    padding: 0;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    padding: 2rem 2rem 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-body {
+    padding: 1rem 2rem 2rem;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #333;
+}
+
+.auth-header {
+    text-align: center;
+}
+
+.auth-header h2 {
+    margin: 0 0 0.5rem;
+    color: #333;
+}
+
+.auth-header p {
+    margin: 0;
+    color: #666;
+}
+
+/* Button Styles */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    margin: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: white;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid #007bff;
+    color: #007bff;
+}
+
+.btn-outline:hover {
+    background: #007bff;
+    color: white;
+}
+
+.btn-full {
+    width: 100%;
+}
+
+/* Form Styles */
+.auth-form {
+    margin-top: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+.password-requirements {
+    margin-top: 0.5rem;
+}
+
+.password-requirements small {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* Role Selection */
+.role-options {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.role-option {
+    flex: 1;
+    min-width: 200px;
+    padding: 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+
+.role-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.role-option:hover,
+.role-option:has(input:checked) {
+    border-color: #007bff;
+    background-color: #f8f9ff;
+}
+
+.role-icon {
+    font-size: 1.5rem;
+    color: #007bff;
+    margin-bottom: 0.5rem;
+}
+
+.role-label {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.role-description {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+.form-footer a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Error Messages */
+.error-message {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    border: 1px solid #f5c6cb;
+}
+
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    border: 1px solid #c3e6cb;
+}
+
+/* Activation Styles */
+.activation-status {
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.activation-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.activation-pending .activation-icon {
+    color: #ffc107;
+}
+
+.activation-success .activation-icon {
+    color: #28a745;
+}
+
+.activation-error .activation-icon {
+    color: #dc3545;
+}
+
+.activation-link {
+    margin: 1rem 0;
+}
+
+.link-button {
+    background: none;
+    border: none;
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: inherit;
+}
+
+.link-button:hover {
+    color: #0056b3;
+}
+
+.resend-section {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.resend-timer {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Accounts List */
+.accounts-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.account-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+}
+
+.account-info h4 {
+    margin: 0 0 0.25rem;
+    color: #333;
+}
+
+.account-info p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.account-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.role-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.role-admin {
+    background: #fff0f0;
+    color: #dc3545;
+}
+
+.role-user {
+    background: #f0f8ff;
+    color: #007bff;
+}
+
+/* Animations */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.animate-on-scroll.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .nav-links {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-cta {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .role-options {
+        flex-direction: column;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .final-cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .account-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+    }
+    
+    .modal-header, .modal-body {
+        padding: 1rem;
+    }
+}
+</style>
+
+<script>
+// Enhanced User Management System
+class UserManager {
+    constructor() {
+        this.users = JSON.parse(sessionStorage.getItem('taskManagerUsers') || '[]');
+        this.currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
+        this.resendTimer = null;
+        this.resendCountdown = 0;
+    }
+
+    // Save users to session storage
+    saveUsers() {
+        sessionStorage.setItem('taskManagerUsers', JSON.stringify(this.users));
+    }
+
+    // Save current user session
+    saveCurrentUser(user) {
+        this.currentUser = user;
+        sessionStorage.setItem('currentUser', JSON.stringify(user));
+    }
+
+    // Check if email already exists
+    emailExists(email) {
+        return this.users.some(user => user.email.toLowerCase() === email.toLowerCase());
+    }
+
+    // Check if username already exists
+    usernameExists(username) {
+        return this.users.some(user => user.username.toLowerCase() === username.toLowerCase());
+    }
+
+    // Validate email format
+    isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    // Validate password strength
+    isValidPassword(password) {
+        return password.length >= 6;
+    }
+
+    // Create new user account
+    createAccount(userData) {
+        const { username, email, password, role } = userData;
+
+        // Validation
+        if (!username || username.length < 3) {
+            throw new Error('Username must be at least 3 characters long');
+        }
+
+        if (!this.isValidEmail(email)) {
+            throw new Error('Please enter a valid email address');
+        }
+
+        if (!this.isValidPassword(password)) {
+            throw new Error('Password must be at least 6 characters long');
+        }
+
+        if (this.emailExists(email)) {
+            throw new Error('An account with this email already exists');
+        }
+
+        if (this.usernameExists(username)) {
+            throw new Error('This username is already taken');
+        }
+
+        // Create new user
+        const newUser = {
+            id: Date.now().toString(),
+            username: username.trim(),
+            email: email.toLowerCase().trim(),
+            password: password, // In real app, this would be hashed
+            role: role || 'user',
+            isActive: false,
+            createdAt: new Date().toISOString(),
+            activationToken: this.generateActivationToken()
+        };
+
+        this.users.push(newUser);
+        this.saveUsers();
+
+        return newUser;
+    }
+
+    // Generate activation token
+    generateActivationToken() {
+        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    }
+
+    // Activate user account
+    activateAccount(token) {
+        const user = this.users.find(u => u.activationToken === token);
+        if (!user) {
+            throw new Error('Invalid activation token');
+        }
+
+        user.isActive = true;
+        user.activatedAt = new Date().toISOString();
+        delete user.activationToken;
+        
+        this.saveUsers();
+        return user;
+    }
+
+    // Login user
+    login(email, password, role) {
+        const user = this.users.find(u => 
+            u.email.toLowerCase() === email.toLowerCase() && 
+            u.password === password
+        );
+
+        if (!user) {
+            throw new Error('Invalid email or password');
+        }
+
+        if (!user.isActive) {
+            throw new Error('Please activate your account first. Check your email for the activation link.');
+        }
+
+        if (user.role !== role) {
+            throw new Error(`This account is not registered as ${role}. Please select the correct account type.`);
+        }
+
+        // Update last login
+        user.lastLogin = new Date().toISOString();
+        this.saveUsers();
+        this.saveCurrentUser(user);
+
+        return user;
+    }
+
+    // Get all users
+    getAllUsers() {
+        return this.users;
+    }
+
+    // Logout current user
+    logout() {
+        this.currentUser = null;
+        sessionStorage.removeItem('currentUser');
+    }
+}
+
+// Initialize user manager
+const userManager = new UserManager();
+
+// Modal functions
+function showLoginModal() {
+    document.getElementById('loginModal').style.display = 'block';
+    clearError('loginError');
+}
+
+function showSignupModal() {
+    document.getElementById('signupModal').style.display = 'block';
+    clearError('signupError');
+}
+
+function showDemoModal() {
+    alert('Demo booking feature coming soon! For now, you can create an account and explore the platform.');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+function switchToSignup() {
+    closeModal('loginModal');
+    showSignupModal();
+}
+
+function switchToLogin() {
+    closeModal('signupModal');
+    showLoginModal();
+}
+
+function showAccountsModal() {
+    document.getElementById('accountsModal').style.display = 'block';
+    displayAccounts();
+}
+
+// Error handling functions
+function showError(elementId, message) {
+    const errorElement = document.getElementById(elementId);
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+}
+
+function clearError(elementId) {
+    const errorElement = document.getElementById(elementId);
+    errorElement.style.display = 'none';
+}
+
+// Display all registered accounts
+function displayAccounts() {
+    const accountsList = document.getElementById('accountsList');
+    const users = userManager.getAllUsers();
+
+    if (users.length === 0) {
+        accountsList.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No accounts registered yet.</p>';
+        return;
+    }
+
+    accountsList.innerHTML = users.map(user => `
+        <div class="account-item">
+            <div class="account-info">
+                <h4>${user.username}</h4>
+                <p>${user.email}</p>
+                <p style="font-size: 0.8rem; color: #999;">Created: ${new Date(user.createdAt).toLocaleDateString()}</p>
+            </div>
+            <div class="account-status">
+                <span class="role-badge role-${user.role}">${user.role}</span>
+                <span class="status-badge ${user.isActive ? 'status-active' : 'status-pending'}">
+                    ${user.isActive ? 'Active' : 'Pending'}
+                </span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Simulate activation process
+function simulateActivation() {
+    const email = document.getElementById('activationEmail').textContent;
+    const user = userManager.users.find(u => u.email === email);
+    
+    if (user && user.activationToken) {
+        try {
+            userManager.activateAccount(user.activationToken);
+            closeModal('activationModal');
+            document.getElementById('activationSuccessModal').style.display = 'block';
+        } catch (error) {
+            showActivationError(error.message);
+        }
+    }
+}
+
+function showActivationError(message) {
+    closeModal('activationModal');
+    document.getElementById('activationErrorMessage').textContent = message;
+    document.getElementById('activationErrorModal').style.display = 'block';
+}
+
+// Resend activation email
+function resendActivationEmail() {
+    if (userManager.resendCountdown > 0) return;
+
+    // Start countdown
+    userManager.resendCountdown = 60;
+    const timerElement = document.getElementById('resendTimer');
+    const resendLink = document.getElementById('resendLink');
+    
+    resendLink.style.pointerEvents = 'none';
+    resendLink.style.opacity = '0.5';
+
+    userManager.resendTimer = setInterval(() => {
+        userManager.resendCountdown--;
+        timerElement.textContent = `(${userManager.resendCountdown}s)`;
+        
+        if (userManager.resendCountdown <= 0) {
+            clearInterval(userManager.resendTimer);
+            timerElement.textContent = '';
+            resendLink.style.pointerEvents = 'auto';
+            resendLink.style.opacity = '1';
+        }
+    }, 1000);
+
+    // Show success message
+    alert('Activation email resent successfully!');
+}
+
+// Form event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Login form handling
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearError('loginError');
+            
+            const selectedRole = document.querySelector('input[name="loginRole"]:checked').value;
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showError('loginError', 'Please fill in all fields');
+                return;
+            }
+            
+            try {
+                const user = userManager.login(email, password, selectedRole);
+                closeModal('loginModal');
+                
+                // Show success message
+                alert(`Welcome back, ${user.username}!`);
+                
+                // Redirect based on role
+                setTimeout(() => {
+                    if (selectedRole === 'admin') {
+                        window.location.href = './newadmin.html';
+                    } else {
+                        window.location.href = './index.html';
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                showError('loginError', error.message);
+            }
+        });
+    }
+    
+    // Signup form handling
+    const signupForm = document.getElementById('signupForm');
+    if (signupForm) {
+        signupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearError('signupError');
+            
+            const selectedRole = document.querySelector('input[name="role"]:checked').value;
+            const username = document.getElementById('signupUsername').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            
+            if (!username || !email || !password) {
+                showError('signupError', 'Please fill in all fields');
+                return;
+            }
+            
+            try {
+                const newUser = userManager.createAccount({
+                    username,
+                    email,
+                    password,
+                    role: selectedRole
+                });
+                
+                closeModal('signupModal');
+                
+                // Show activation modal
+                document.getElementById('activationEmail').textContent = email;
+                document.getElementById('activationModal').style.display = 'block';
+                
+            } catch (error) {
+                showError('signupError', error.message);
+            }
+        });
+    }
+
+    // Close modals when clicking outside
+    window.addEventListener('click', function(event) {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+});
+
+// Animation on scroll
+function animateOnScroll() {
+    const elements = document.querySelectorAll('.animate-on-scroll');
+    elements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const elementVisible = 150;
+        
+        if (elementTop < window.innerHeight - elementVisible) {
+            element.classList.add('active');
+        }
+    });
+}
+
+window.addEventListener('scroll', animateOnScroll);
+
+// Initialize animations on page load
+document.addEventListener('DOMContentLoaded', function() {
+    animateOnScroll();
+});
+</script>
+</body>
+<script type="module" src="./Landingscript.js"></script>
+</html>
+
